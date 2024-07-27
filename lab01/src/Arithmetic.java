@@ -12,7 +12,7 @@ public class Arithmetic {
      * @return Product of a and b
      * */
     public static int product(int a, int b) {
-        return a * b;
+        return a + b;
     }
 
     /** Computes sum of two ints (incorrectly).
