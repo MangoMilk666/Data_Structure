@@ -85,6 +85,13 @@ public class Model {
      * */
     public boolean emptySpaceExists() {
         // TODO: Task 2. Fill in this function.
+        for (int i=0; i<board.size(); i++){
+            for (int j=0; j<board.size(); j++){
+                if (board.tile(i, j) == null){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -95,6 +102,13 @@ public class Model {
      */
     public boolean maxTileExists() {
         // TODO: Task 3. Fill in this function.
+        for (int i=0; i<board.size(); i++){
+            for (int j=0; j<board.size(); j++){
+                if (board.tile(i, j) != null && board.tile(i, j).value() == MAX_PIECE){
+                    return true;
+                }
+            }
+        }
         return false;
     }
 
@@ -106,6 +120,34 @@ public class Model {
      */
     public boolean atLeastOneMoveExists() {
         // TODO: Fill in this function.
+        for (int i=1; i<board.size()-1; i++){
+            for (int j=1; j<board.size()-1; j++){
+                if (emptySpaceExists() || board.tile(i, j).value() == board.tile(i-1, j).value() ||
+                board.tile(i, j).value() == board.tile(i+1, j).value() ||
+                        board.tile(i, j).value() == board.tile(i, j-1).value() ||
+                        board.tile(i, j).value() == board.tile(i, j+1).value()){
+                    return true;
+                }
+
+            }
+        }
+        //还要检查四个角落
+        if (board.tile(0, 0).value() == board.tile(0, 1).value() ||
+            board.tile(0, 0).value() == board.tile(1, 0).value()){
+            return true;
+        }
+        if (board.tile(0, board.size()-1).value() == board.tile(0, board.size()-2).value() ||
+                board.tile(0, board.size()-1).value() == board.tile(1, board.size()-1).value()){
+            return true;
+        }
+        if (board.tile(board.size()-1, 0).value() == board.tile(board.size()-1, 1).value() ||
+                board.tile(board.size()-1, 0).value() == board.tile(board.size()-2, 0).value()){
+            return true;
+        }
+        if (board.tile(board.size()-1, board.size()-1).value() == board.tile(board.size()-1, board.size()-2).value() ||
+                board.tile(board.size()-1, board.size()-1).value() == board.tile(board.size()-2, board.size()-1).value()){
+            return true;
+        }
         return false;
     }
 
@@ -129,6 +171,26 @@ public class Model {
         int targetY = y;
 
         // TODO: Tasks 5, 6, and 10. Fill in this function.
+        //Task5：Move Tile up with no merging
+        //Task6: Merging Tiles if necessary
+        //check if merge exits first, then do the ordinary moves.
+        for (int i=targetY+1; i< board.size(); i++){
+            if (board.tile(x, i) != null && board.tile(x, i).value() == currTile.value()){
+                board.move(x, i, currTile);
+                targetY=i;
+                break;
+            }
+        }
+
+        for (int j= board.size()-1; j>targetY; j--){
+            if (board.tile(x, j) == null){
+                board.move(x, j, currTile);
+                break;
+            }
+        }
+
+
+
     }
 
     /** Handles the movements of the tilt in column x of the board
@@ -138,10 +200,19 @@ public class Model {
      * */
     public void tiltColumn(int x) {
         // TODO: Task 7. Fill in this function.
+        for (int i= board.size()-1; i>=0; i--){
+            if (board.tile(x, i) != null){
+                moveTileUpAsFarAsPossible(x, i);
+            }
+        }
     }
 
     public void tilt(Side side) {
         // TODO: Tasks 8 and 9. Fill in this function.
+        //Task8: tilt the entire board up, moving all tiles in all columns into their rightful place.
+        for (int i=0; i< board.size(); i++){
+            tiltColumn(i);
+        }
     }
 
     /** Tilts every column of the board toward SIDE.

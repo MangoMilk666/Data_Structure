@@ -12,6 +12,7 @@ public class Board {
     /** Side that the board currently views as north. */
     private Side _viewPerspective;
 
+    //根据大小构建棋盘
     public Board(int size) {
         _values = new Tile[size][size];
         _viewPerspective = Side.NORTH;
@@ -24,6 +25,7 @@ public class Board {
 
     /** Create a board where RAWVALUES hold the values of the tiles on the board 
      * (0 is null) with a current score of SCORE and the viewing perspective set to north. */
+    //根据传入数组构建棋盘
     public Board(int[][] rawValues) {
         int size = rawValues.length;
         _values = new Tile[size][size];
@@ -72,7 +74,7 @@ public class Board {
     }
 
     
-    /** Places the Tile TILE at column x, y y where x and y are
+    /** Places the Tile TILE at column x, y where x and y are
      * treated as coordinates with respect to the current viewPerspective.
      *
      * (0, 0) is bottom-left corner.
@@ -88,6 +90,7 @@ public class Board {
 
         // Move or merge the tile. It is important to call setNext
         // on the old tile(s) so they can be animated into position
+        //单次的移动或移动+融合
         Tile next;
         if (tile1 == null) {
             next = Tile.create(tile.value(), px, py);
@@ -95,9 +98,11 @@ public class Board {
             if (tile.value() != tile1.value()) {
                 throw new IllegalArgumentException("Tried to merge two unequal tiles: " + tile + " and " + tile1);
             }
+            //若不想等则抛出异常终止，若两个方块值相等则融合
             next = Tile.create(2 * tile.value(), px, py);
             tile1.setNext(next);
         }
+
         tile.setMerged(tile1 != null);
         next.setMerged(tile.wasMerged());
         tile.setNext(next);
