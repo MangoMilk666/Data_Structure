@@ -86,6 +86,7 @@ public class Board {
         int py = _viewPerspective.y(x, y, size());
 
         Tile tile1 = vtile(x, y, _viewPerspective);
+        //原位置的方块占领状态被清空
         _values[tile.x()][tile.y()] = null;
 
         // Move or merge the tile. It is important to call setNext

@@ -4,6 +4,7 @@ import game2048rendering.Board;
 import game2048rendering.Side;
 import game2048rendering.Tile;
 
+import java.util.ArrayList;
 import java.util.Formatter;
 
 
@@ -120,6 +121,12 @@ public class Model {
      */
     public boolean atLeastOneMoveExists() {
         // TODO: Fill in this function.
+        if (board.size() <= 1){
+            if (emptySpaceExists()){
+                return true;
+            }
+            return false;
+        }
         for (int i=1; i<board.size()-1; i++){
             for (int j=1; j<board.size()-1; j++){
                 if (emptySpaceExists() || board.tile(i, j).value() == board.tile(i-1, j).value() ||
@@ -132,20 +139,20 @@ public class Model {
             }
         }
         //还要检查四个角落
-        if (board.tile(0, 0).value() == board.tile(0, 1).value() ||
-            board.tile(0, 0).value() == board.tile(1, 0).value()){
+        if (((board.tile(0, 0) != null) && (board.tile(0, 1) != null) && (board.tile(0, 0).value() == board.tile(0, 1).value())) ||
+                ((board.tile(0, 0) != null) && (board.tile(1, 0) != null) && (board.tile(0, 0).value() == board.tile(1, 0).value()))){
             return true;
         }
-        if (board.tile(0, board.size()-1).value() == board.tile(0, board.size()-2).value() ||
-                board.tile(0, board.size()-1).value() == board.tile(1, board.size()-1).value()){
+        if (((board.tile(0, board.size()-1) != null) && (board.tile(0, board.size()-2) != null) && (board.tile(0, board.size()-1).value() == board.tile(0, board.size()-2).value())) ||
+                ((board.tile(0, board.size()-1) != null) && (board.tile(1, board.size()-1) != null) && (board.tile(0, board.size()-1).value() == board.tile(1, board.size()-1).value()))){
             return true;
         }
-        if (board.tile(board.size()-1, 0).value() == board.tile(board.size()-1, 1).value() ||
-                board.tile(board.size()-1, 0).value() == board.tile(board.size()-2, 0).value()){
+        if (((board.tile(board.size()-1, 0) != null) && (board.tile(board.size()-1, 1) != null) && (board.tile(board.size()-1, 0).value() == board.tile(board.size()-1, 1).value())) ||
+                ((board.tile(board.size()-1, 0) != null) && (board.tile(board.size()-2, 0) != null) && (board.tile(board.size()-1, 0).value() == board.tile(board.size()-2, 0).value()))){
             return true;
         }
-        if (board.tile(board.size()-1, board.size()-1).value() == board.tile(board.size()-1, board.size()-2).value() ||
-                board.tile(board.size()-1, board.size()-1).value() == board.tile(board.size()-2, board.size()-1).value()){
+        if (((board.tile(board.size()-1, board.size()-1) != null) && (board.tile(board.size()-1, board.size()-2) != null) && (board.tile(board.size()-1, board.size()-1).value() == board.tile(board.size()-1, board.size()-2).value())) ||
+                ((board.tile(board.size()-1, board.size()-1) != null) && (board.tile(board.size()-2, board.size()-1) != null) && (board.tile(board.size()-1, board.size()-1).value() == board.tile(board.size()-2, board.size()-1).value()))){
             return true;
         }
         return false;
@@ -166,6 +173,7 @@ public class Model {
      *    and the trailing tile does not.
      */
     public void moveTileUpAsFarAsPossible(int x, int y) {
+        //将位置为x,y的tile移动至该行（列）某方向的最远处
         Tile currTile = board.tile(x, y);
         int myValue = currTile.value();
         int targetY = y;
@@ -174,22 +182,31 @@ public class Model {
         //Task5：Move Tile up with no merging
         //Task6: Merging Tiles if necessary
         //check if merge exits first, then do the ordinary moves.
-        for (int i=targetY+1; i< board.size(); i++){
-            if (board.tile(x, i) != null && board.tile(x, i).value() == currTile.value()){
-                board.move(x, i, currTile);
-                targetY=i;
-                break;
+        boolean alreadyMoved = false;
+        for (int i = y + 1; i < board.size(); i++) {
+            Tile nextTile = board.tile(x, i);
+            if (nextTile == null) {
+                targetY = i;
+            } else if (nextTile != null) {
+                alreadyMoved = true;
+                if (nextTile.value() != myValue && targetY != y) { //immergable tiles halfway
+                    //if no merge could happen, do the ordinary move
+                    board.move(x, targetY, currTile);
+                    break;
+                } else if (nextTile.value() == myValue && !nextTile.wasMerged() && !currTile.wasMerged()) {
+                    board.move(x, i, currTile);
+                    myValue = 2 * myValue;
+                    score += myValue; //value increase if merged
+                    break;
+                }
+
             }
         }
-
-        for (int j= board.size()-1; j>targetY; j--){
-            if (board.tile(x, j) == null){
-                board.move(x, j, currTile);
-                break;
-            }
+        //if haven't moved, then move. 除了顶端，半路没有方块
+        //do nothing to tilts on the border
+        if (!alreadyMoved && y!=targetY) {
+            board.move(x, targetY, currTile);
         }
-
-
 
     }
 
@@ -210,10 +227,16 @@ public class Model {
     public void tilt(Side side) {
         // TODO: Tasks 8 and 9. Fill in this function.
         //Task8: tilt the entire board up, moving all tiles in all columns into their rightful place.
+        //Task9: we’ve gotten tilt working for the up direction, we have to do the same thing for the other three directions.
+        board.setViewingPerspective(side);
         for (int i=0; i< board.size(); i++){
             tiltColumn(i);
         }
+        //set the perspective back to Side.NORTH before we finish your call to tilt
+        board.setViewingPerspective(Side.NORTH);
     }
+
+
 
     /** Tilts every column of the board toward SIDE.
      */
