@@ -187,16 +187,19 @@ public class Model {
             Tile nextTile = board.tile(x, i);
             if (nextTile == null) {
                 targetY = i;
-            } else if (nextTile != null) {
-                alreadyMoved = true;
-                if (nextTile.value() != myValue && targetY != y) { //immergable tiles halfway
-                    //if no merge could happen, do the ordinary move
-                    board.move(x, targetY, currTile);
-                    break;
-                } else if (nextTile.value() == myValue && !nextTile.wasMerged() && !currTile.wasMerged()) {
+            } else {
+                if (nextTile.value() == myValue && !nextTile.wasMerged() && !currTile.wasMerged()) {
+                    alreadyMoved=true;
                     board.move(x, i, currTile);
-                    myValue = 2 * myValue;
+                    currTile = board.tile(x, i); //合并后上方有空格，也要继续移动
+                    myValue = currTile.value();
                     score += myValue; //value increase if merged
+                    targetY=i;
+                    break;
+                } else{
+                    alreadyMoved=true;
+                    //if no merge, do ordinary move.
+                    board.move(x, targetY, currTile);
                     break;
                 }
 
