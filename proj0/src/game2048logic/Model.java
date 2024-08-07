@@ -12,9 +12,13 @@ import java.util.Formatter;
  *  @author P. N. Hilfinger + Josh Hug
  */
 public class Model {
-    /** Current contents of the board. */
+    /**
+     * Current contents of the board.
+     */
     private final Board board;
-    /** Current score. */
+    /**
+     * Current score.
+     */
     private int score;
 
     /* Coordinate System: column x, row y of the board (where x = 0,
@@ -22,73 +26,94 @@ public class Model {
      * to board.tile(x, y).  Be careful!
      */
 
-    /** Largest piece value. */
+    /**
+     * Largest piece value.
+     */
     public static final int MAX_PIECE = 2048;
 
-    /** A new 2048 game on a board of size SIZE with no pieces
-     *  and score 0. */
+    /**
+     * A new 2048 game on a board of size SIZE with no pieces
+     * and score 0.
+     */
     public Model(int size) {
         board = new Board(size);
         score = 0;
     }
 
-    /** A new 2048 game where RAWVALUES contain the values of the tiles
+    /**
+     * A new 2048 game where RAWVALUES contain the values of the tiles
      * (0 if null). VALUES is indexed by (x, y) with (0, 0) corresponding
-     * to the bottom-left corner. Used for testing purposes. */
+     * to the bottom-left corner. Used for testing purposes.
+     */
     public Model(int[][] rawValues, int score) {
         board = new Board(rawValues);
         this.score = score;
     }
 
-    /** Return the current Tile at (x, y), where 0 <= x < size(),
-     *  0 <= y < size(). Returns null if there is no tile there.
-     *  Used for testing. */
+    /**
+     * Return the current Tile at (x, y), where 0 <= x < size(),
+     * 0 <= y < size(). Returns null if there is no tile there.
+     * Used for testing.
+     */
     public Tile tile(int x, int y) {
         return board.tile(x, y);
     }
 
-    /** Return the number of squares on one side of the board. */
+    /**
+     * Return the number of squares on one side of the board.
+     */
     public int size() {
         return board.size();
     }
 
-    /** Return the current score. */
+    /**
+     * Return the current score.
+     */
     public int score() {
         return score;
     }
 
 
-    /** Clear the board to empty and reset the score. */
+    /**
+     * Clear the board to empty and reset the score.
+     */
     public void clear() {
         score = 0;
         board.clear();
     }
 
-    /** Add TILE to the board. There must be no Tile currently at the
-     *  same position. */
+    /**
+     * Add TILE to the board. There must be no Tile currently at the
+     * same position.
+     */
     public void addTile(Tile tile) {
         board.addTile(tile);
     }
 
-    /** Return true iff the game is over (there are no moves, or
-     *  there is a tile with value 2048 on the board). */
+    /**
+     * Return true iff the game is over (there are no moves, or
+     * there is a tile with value 2048 on the board).
+     */
     public boolean gameOver() {
         return maxTileExists() || !atLeastOneMoveExists();
     }
 
-    /** Returns this Model's board. */
+    /**
+     * Returns this Model's board.
+     */
     public Board getBoard() {
         return board;
     }
 
-    /** Returns true if at least one space on the Board is empty.
-     *  Empty spaces are stored as null.
-     * */
+    /**
+     * Returns true if at least one space on the Board is empty.
+     * Empty spaces are stored as null.
+     */
     public boolean emptySpaceExists() {
         // TODO: Task 2. Fill in this function.
-        for (int i=0; i<board.size(); i++){
-            for (int j=0; j<board.size(); j++){
-                if (board.tile(i, j) == null){
+        for (int i = 0; i < board.size(); i++) {
+            for (int j = 0; j < board.size(); j++) {
+                if (board.tile(i, j) == null) {
                     return true;
                 }
             }
@@ -103,9 +128,9 @@ public class Model {
      */
     public boolean maxTileExists() {
         // TODO: Task 3. Fill in this function.
-        for (int i=0; i<board.size(); i++){
-            for (int j=0; j<board.size(); j++){
-                if (board.tile(i, j) != null && board.tile(i, j).value() == MAX_PIECE){
+        for (int i = 0; i < board.size(); i++) {
+            for (int j = 0; j < board.size(); j++) {
+                if (board.tile(i, j) != null && board.tile(i, j).value() == MAX_PIECE) {
                     return true;
                 }
             }
@@ -121,12 +146,10 @@ public class Model {
      */
     public boolean atLeastOneMoveExists() {
         // TODO: Fill in this function.
-        if (board.size() <= 1){
-            if (emptySpaceExists()){
-                return true;
-            }
-            return false;
+        if (emptySpaceExists()) {
+            return true;
         }
+
         for (int i=1; i<board.size()-1; i++){
             for (int j=1; j<board.size()-1; j++){
                 if (emptySpaceExists() || board.tile(i, j).value() == board.tile(i-1, j).value() ||
@@ -188,26 +211,31 @@ public class Model {
             if (nextTile == null) {
                 targetY = i;
             } else {
-                if (nextTile.value() == myValue && !nextTile.wasMerged() && !currTile.wasMerged()) {
-                    alreadyMoved=true;
+                if (nextTile.value() == myValue && !nextTile.wasMerged()) { //&& !currTile.wasMerged();
+                    alreadyMoved = true;
                     board.move(x, i, currTile);
                     currTile = board.tile(x, i); //合并后上方有空格，也要继续移动
                     myValue = currTile.value();
                     score += myValue; //value increase if merged
-                    targetY=i;
+                    targetY = i;
                     break;
-                } else{
-                    alreadyMoved=true;
-                    //if no merge, do ordinary move.
-                    board.move(x, targetY, currTile);
-                    break;
-                }
+                } else {
+                    if (nextTile.value() != myValue && targetY != y) {
+                        alreadyMoved = true;
+                        //if no merge, do ordinary move.
+                        board.move(x, targetY, currTile);
+                        break;
+                    } else if (nextTile.value() != myValue){
+                        //只满足一个条件
+                        break;
+                    }
 
+                }
             }
         }
         //if haven't moved, then move. 除了顶端，半路没有方块
         //do nothing to tilts on the border
-        if (!alreadyMoved && y!=targetY) {
+        if (!alreadyMoved && y != targetY) {
             board.move(x, targetY, currTile);
         }
 
@@ -220,7 +248,7 @@ public class Model {
      * */
     public void tiltColumn(int x) {
         // TODO: Task 7. Fill in this function.
-        for (int i= board.size()-1; i>=0; i--){
+        for (int i= board.size()-2; i>=0; i--){
             if (board.tile(x, i) != null){
                 moveTileUpAsFarAsPossible(x, i);
             }
