@@ -38,7 +38,9 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
             Sentinel.next = newNode;
             Sentinel.previous = newNode;
         } else {
-            Sentinel.next = new TNode(Sentinel, x, Sentinel.next);
+            TNode newNode = new TNode(Sentinel, x, Sentinel.next);
+            Sentinel.next.previous = newNode;
+            Sentinel.next = newNode;
         }
         size++;
     }
@@ -63,7 +65,7 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
         List<T> returnList = new ArrayList<>();
         //复制链表中的元素至returnList
         TNode p = Sentinel.next;
-        while (p != Sentinel) {
+        while (p != Sentinel && p != null) {
             if (p.item != null) {
                 returnList.add(p.item);
             }
@@ -88,25 +90,84 @@ public class LinkedListDeque61B<T> implements Deque61B<T> {
 
     @Override
     public T removeFirst() {
-        if (Sentinel.next != null){
-            Sentinel.next = Sentinel.next.next;
+        TNode p = Sentinel.next;
+        if (p != null){
+            if (p.next != Sentinel) {
+                Sentinel.next = p.next;
+                p.next.previous = Sentinel;
+                size--;
+            } else {
+                //Only the sentinel finally left
+                Sentinel.previous = null;
+                Sentinel.next = null;
+                size--;
+            }
+            return p.item;
+        }
+        return null;
+    }
+
+
+    @Override
+    public T removeLast() {
+        TNode p = Sentinel.previous;
+        if (p != null) {
+            if (p.previous != Sentinel) {
+                Sentinel.previous = p.previous;
+                p.previous.next = Sentinel;
+                size--;
+                return p.item;
+            } else {
+                //Only the sentinel finally left
+                Sentinel.previous = null;
+                Sentinel.next = null;
+                size--;
+                return p.item;
+            }
+        }
+        return null;
+    }
+
+
+    @Override
+    public T get(int index) {
+        if (index <= 0 || index > size){
+            return null;
+        }
+        int count=0;
+        TNode currNode = Sentinel;
+        while (count < index){
+            currNode = currNode.next;
+            count++;
+        }
+        if (currNode.item != null){
+            return currNode.item;
         }
         return null;
     }
 
     @Override
-    public T removeLast() {
-        return null;
-    }
-
-    @Override
-    public T get(int index) {
-        return null;
-    }
-
-    @Override
     public T getRecursive(int index) {
-        return null;
+        //递归方式实现
+        if (index <= 0 || index > size){
+            //越界或只存在sentinel节点
+            return null;
+        }
+        return getRecursive(Sentinel, index);
+    }
+
+    private T getRecursive(TNode curr, int index) {
+        //assistant method to help shape public getRecursive method
+        //index代表此刻节点curr离目标节点的数量距离
+        if (index == 0) {
+            if (curr != null) {
+                return curr.item;
+            } else {
+                return null;
+            }
+        } else {
+            return getRecursive(curr.next, index-1);
+        }
     }
 }
 
