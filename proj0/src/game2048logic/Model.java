@@ -150,13 +150,13 @@ public class Model {
             return true;
         }
 
-        for (int i=1; i<board.size()-1; i++){
-            for (int j=1; j<board.size()-1; j++){
-                if (emptySpaceExists() || board.tile(i, j).value() == board.tile(i-1, j).value() ||
-                board.tile(i, j).value() == board.tile(i+1, j).value() ||
-                        board.tile(i, j).value() == board.tile(i, j-1).value() ||
-                        board.tile(i, j).value() == board.tile(i, j+1).value()){
-                    return true;
+        for (int i = 1; i < board.size() - 1; i++) {
+            for (int j = 1; j < board.size() - 1; j++) {
+                if (emptySpaceExists() || board.tile(i, j).value() == board.tile(i - 1, j).value()
+                    || board.tile(i, j).value() == board.tile(i + 1, j).value()
+                    || board.tile(i, j).value() == board.tile(i, j - 1).value()
+                    || board.tile(i, j).value() == board.tile(i, j + 1).value()){
+                        return true;
                 }
 
             }
@@ -226,7 +226,7 @@ public class Model {
                         board.move(x, targetY, currTile);
                         break;
                     } else if (nextTile.value() != myValue){
-                        //只满足一个条件
+                        //**只满足有方块挡路一个条件，则跳出循环
                         break;
                     }
 
