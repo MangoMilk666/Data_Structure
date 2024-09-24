@@ -1,28 +1,47 @@
+//work with non-negative integers as the items in our disjoint sets.
 public class UnionFind {
     // TODO: Instance variables
+    private int[] parent;
+
 
     /* Creates a UnionFind data structure holding N items. Initially, all
        items are in disjoint sets. */
     public UnionFind(int N) {
         // TODO: YOUR CODE HERE
+        parent = new int[N];
+        for (int i=0; i< N; i++){
+            parent[i] = -1;
+        }
     }
 
     /* Returns the size of the set V belongs to. */
     public int sizeOf(int v) {
         // TODO: YOUR CODE HERE
-        return -1;
+        if (v < 0 || v >= parent.length){
+            throw new IllegalArgumentException("Out of bounds of set");
+        }
+        int root = find(v);
+        return (-1)*parent(root);
     }
 
     /* Returns the parent of V. If V is the root of a tree, returns the
        negative size of the tree for which V is the root. */
     public int parent(int v) {
         // TODO: YOUR CODE HERE
-        return -1;
+        if (v < 0 || v >= parent.length){
+            throw new IllegalArgumentException("Out of bounds of set");
+        }
+        return parent[v];
     }
 
     /* Returns true if nodes/vertices V1 and V2 are connected. */
     public boolean connected(int v1, int v2) {
         // TODO: YOUR CODE HERE
+        int p = find(v1);
+        int q = find(v2);
+        if (p == q){
+            return true;
+        }
         return false;
     }
 
@@ -31,7 +50,23 @@ public class UnionFind {
        function, throw an IllegalArgumentException. */
     public int find(int v) {
         // TODO: YOUR CODE HERE
-        return -1;
+        if (v < 0 || v >= parent.length){
+            throw new IllegalArgumentException("Out of bounds of set");
+        }
+        int p = v;
+        //root上方为weight的相反数
+        while (parent[p] >= 0){
+            p = parent[p];
+        }
+        int root = p;
+        p = v;
+        while (parent[p] >= 0){
+            int temp = parent[p];
+            parent[p] = root;
+            p = temp;
+        }
+        //root结点会返回自身
+        return root;
     }
 
     /* Connects two items V1 and V2 together by connecting their respective
@@ -41,6 +76,20 @@ public class UnionFind {
        already connected should not change the structure. */
     public void union(int v1, int v2) {
         // TODO: YOUR CODE HERE
+        int p = find(v1);
+        int q = find(v2);
+        if (p == q){
+            return;
+        }
+        if (parent[p] < parent[q]){
+            //q树入p树
+            parent[p] += parent[q];
+            parent[q] = p;
+        } else {
+            //p树入q树
+            parent[q] += parent[p];
+            parent[p] = q;
+        }
     }
 
 }
