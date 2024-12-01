@@ -1,3 +1,10 @@
+//Left-leaning Red-Black(LLRB) Tree的实现
+/*LLRB Tree Properties：
+1) Using colored nodes as our representation, the root node must be colored black.
+2) No node can have two red children.
+3) No red node can have a red parent (every red node’s parent is black).
+4) In a balanced LLRB tree, every path to a null reference goes through the same number of black nodes.
+*/
 public class RedBlackTree<T extends Comparable<T>> {
 
     /* Root of the tree. */
@@ -51,6 +58,15 @@ public class RedBlackTree<T extends Comparable<T>> {
      */
     void flipColors(RBTreeNode<T> node) {
         // TODO: YOUR CODE HERE
+        if (node != null) {
+            node.isBlack = !node.isBlack;
+        }
+        if (node.left != null) {
+            node.left.isBlack = !node.left.isBlack;
+        }
+        if (node.right != null) {
+            node.right.isBlack = !node.right.isBlack;
+        }
     }
 
     /**
@@ -62,7 +78,13 @@ public class RedBlackTree<T extends Comparable<T>> {
      */
     RBTreeNode<T> rotateRight(RBTreeNode<T> node) {
         // TODO: YOUR CODE HERE
-        return null;
+        RBTreeNode<T> newSubRoot = node.left;
+        node.left = newSubRoot.right;
+        newSubRoot.right = node;
+        boolean temp = node.isBlack;
+        node.isBlack = newSubRoot.isBlack;
+        newSubRoot.isBlack = temp;
+        return newSubRoot;
     }
 
     /**
@@ -74,6 +96,12 @@ public class RedBlackTree<T extends Comparable<T>> {
      */
     RBTreeNode<T> rotateLeft(RBTreeNode<T> node) {
         // TODO: YOUR CODE HERE
+        RBTreeNode<T> newSubRoot = node.right;
+        node.right = newSubRoot.left;
+        newSubRoot.left = node;
+        boolean temp = node.isBlack;
+        node.isBlack = newSubRoot.isBlack;;
+        newSubRoot.isBlack = temp;
         return null;
     }
 
@@ -92,7 +120,7 @@ public class RedBlackTree<T extends Comparable<T>> {
      * @param item
      */
     public void insert(T item) {
-        root = insert(root, item);
+        root = insert(root, item); //能够处理root为空
         root.isBlack = true;
     }
 
@@ -106,16 +134,37 @@ public class RedBlackTree<T extends Comparable<T>> {
      */
     private RBTreeNode<T> insert(RBTreeNode<T> node, T item) {
         // TODO: Insert (return) new red leaf node.
+        if (node == null){
+            return new RBTreeNode<>(false, item);
+        }
 
         // TODO: Handle normal binary search tree insertion.
+        int cmp = item.compareTo(node.item);
+        if (cmp < 0){
+            node.left = insert(node.left, item);
+        } else if (cmp > 0){
+            node.right = insert(node.right, item);
+        } else {
+            return node; //已存在的结点直接返回
+        }
 
         // TODO: Rotate left operation
-
+        //最终插入后，级数最高的node即为新结点的parent
+        //左黑右红 --> 左旋
+        //各级递归都有自身的node，插入的同时维护结点。
+        // 颜色辅助函数isRed()免去检查是否为null
+        if (isRed(node.right) && !isRed(node.left)){
+            rotateLeft(node);
+        }
         // TODO: Rotate right operation
-
+        //左子、左孙结点同时为红 --> 右旋
+        if (isRed(node) && isRed(node.right)){
+             rotateRight(node);
+        }
         // TODO: Color flip
-
-        return null; //fix this return statement
+        //左右子结点同时为红 --> 颜色翻转
+        flipColors(node);
+        return node; //fix this return statement
     }
 
 }

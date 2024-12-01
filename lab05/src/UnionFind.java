@@ -50,6 +50,7 @@ public class UnionFind {
        function, throw an IllegalArgumentException. */
     public int find(int v) {
         // TODO: YOUR CODE HERE
+        //通过两个遍历进行路径压缩
         if (v < 0 || v >= parent.length){
             throw new IllegalArgumentException("Out of bounds of set");
         }
@@ -67,6 +68,19 @@ public class UnionFind {
         }
         //root结点会返回自身
         return root;
+    }
+
+    //  Recursive method, more concise and understandable than iteration
+    public int find_recursive(int v) {
+        if (v < 0 || v >= parent.length) {
+            throw new IllegalArgumentException("Out of bounds of set");
+        }
+        if (parent[v] < 0) {
+            return v; // 如果当前节点是根节点，直接返回
+        } else {
+            parent[v] = find(parent[v]); // 路径压缩，将当前节点直接连接到根节点
+            return parent[v];
+        }
     }
 
     /* Connects two items V1 and V2 together by connecting their respective

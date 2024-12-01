@@ -128,27 +128,28 @@ public class UnionFindTest {
         assertThat(uf.parent(1)).isEqualTo(7);
 
         //2 --> 0,8,9
-        uf.union(2,8);
+        uf.union(2,0);
         assertThat(uf.find(2)).isEqualTo(9);
         assertThat(uf.sizeOf(8)).isEqualTo(4);
         assertThat(uf.parent(2)).isEqualTo(9);
 
         //1，6，7 --> 0,2,8,9
-        uf.union(1,9);
-        assertThat(uf.find(1)).isEqualTo(9);
+        uf.union(1,2);
+        assertThat(uf.find_recursive(1)).isEqualTo(9);
         assertThat(uf.sizeOf(7)).isEqualTo(7);
-        //before and after find(6)
-        assertThat(uf.parent(6)).isEqualTo(7);
-        uf.find(6);
-        assertThat(uf.parent(6)).isEqualTo(9);
+        assertThat(uf.find_recursive(7)).isEqualTo(9);
 
+        //before and after find_recursive(6)
+        assertThat(uf.parent(6)).isEqualTo(7);
+        uf.find_recursive(6);
+        assertThat(uf.parent(6)).isEqualTo(9);
 
         assertThat(uf.connected(3,4)).isFalse();
         assertThat(uf.connected(4,5)).isFalse();
         assertThat(uf.connected(0,8)).isTrue();
         assertThat(uf.connected(1,7)).isTrue();
         assertThat(uf.connected(2,6)).isTrue();
-        assertThat(uf.connected(6, 9)).isTrue();
+        assertThat(uf.connected(6,9)).isTrue();
 
         //sizeOfTest
         assertThat(uf.sizeOf(0)).isEqualTo(7);
@@ -159,18 +160,7 @@ public class UnionFindTest {
         assertThat(uf.sizeOf(4)).isEqualTo(1);
         assertThat(uf.sizeOf(5)).isEqualTo(1);
 
-        //findTest
-
-        //parentTest
-        //以上两个tests应该要结合到上面那一坨👆
-
     }
-
-    @Test
-    public void AllMethodsTest(){
-
-    }
-
 
 }
 
